@@ -32,6 +32,8 @@ syncCharB = "e"
 lithiumMessage = []
 lithiumMessage.append(syncCharA.encode())
 lithiumMessage.append(syncCharB.encode())
+sizeBytes = bytearray.fromhex(format(len(lithiumMessage), '02x'))
+lithiumMessage.append(sizeBytes)
 lithiumMessage.append(bytearray.fromhex(commandType[2:]))
 
 for hexStr in payloadArray:
