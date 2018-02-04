@@ -15,6 +15,10 @@ while not validByteHexString(commandType):
     if not validByteHexString(commandType):
         print("Invalid Input")
 
+direction = " "
+while not validByteHexString(direction):
+    direction = input("Enter direction In : (0x10), Out : (0x20): ")
+
 userInput = " "
 payloadArray = []
 while userInput.upper() != "DONE":
@@ -27,22 +31,27 @@ while userInput.upper() != "DONE":
         userInput = " "
         print("Invalid input")
 
-syncCharA = "H"
-syncCharB = "e"
-lithiumMessage = []
-lithiumMessage.append(syncCharA.encode())
-lithiumMessage.append(syncCharB.encode())
-sizeBytes = bytearray.fromhex(format(len(lithiumMessage), '02x'))
-lithiumMessage.append(sizeBytes)
-lithiumMessage.append(bytearray.fromhex(commandType[2:]))
+syncCharA = 0x48 #H
+syncCharB = 0x65 #e
+lithiumMessage = bytearray()
+lithiumMessage.append(syncCharA)
+lithiumMessage.append(syncCharB)
+lithiumMessage.append(bytearray.fromhex(direction[2:])[0])
+lithiumMessage.append(bytearray.fromhex(commandType[2:])[0])
+
+sizeBytes = bytearray.fromhex(format(len(payloadArray), '04x'))
+for byte in sizeBytes:
+    lithiumMessage.append(byte)    
 
 for hexStr in payloadArray:
-    lithiumMessage.append(bytearray.fromhex(hexStr[2:]))
+    lithiumMessage.append(bytearray.fromhex(hexStr[2:])[0])
+
+print("Input is:" + str(lithiumMessage))
 
 ckA = 0
 ckB = 0
-for byte in lithiumMessage:
-    ckA = ckA + byte[0]
+for i in range(2, len(lithiumMessage)):
+    ckA = ckA + int(lithiumMessage[i])
     ckB = ckB + ckA
 
 ckA %= 256
